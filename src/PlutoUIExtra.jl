@@ -11,7 +11,7 @@ include("radio.jl")
 include("textfield.jl")
 
 
-export bindobs, bindobs_
+export @bindobs, @bindobs_
 
 macro bindobs(def::Symbol, element)
     defraw = Symbol(def, :____raw)
