@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.38
+# v0.19.41
 
 using Markdown
 using InteractiveUtils
@@ -56,6 +56,64 @@ begin
 		vals = unique(round.(vals, sigdigits=3))
 		Slider(vals; kwargs...)
 	end
+
+	function Base.show(io::IO, m::MIME"text/html", slider::Slider)
+		start_index = findfirst(isequal(slider.default), slider.values)
+		
+		# comment from @fonsp:
+		# It looks like this could be implemented in a slightly more robust way by listening to the "change" event instead of "input" on the <input type=range> element. That means that you don't need the mouseup handlers, but you still need a wrapper element, custom value property etc.
+		show(io, m, @htl(
+			"""
+			$(
+					slider.on_release ? @htl(
+					"""<span></span>
+					<script>
+					const input_el = currentScript.nextElementSibling;
+					const event_el = currentScript.previousElementSibling;
+	
+					const propagateevt = () => {
+						const new_value = input_el.valueAsNumber;
+						if (new_value == event_el.value) {
+							return;
+						}
+						event_el.value = new_value;
+						event_el.dispatchEvent(new CustomEvent("input"));
+					}
+					input_el.addEventListener("mouseup", propagateevt);
+					input_el.addEventListener("touchend", propagateevt);
+					input_el.addEventListener("input", e => e.stopPropagation());
+					event_el.value = $start_index;
+					</script>
+					"""
+				) : nothing
+			)
+			<input $((
+				type="range",
+				min=1,
+				max=length(slider.values),
+				value=start_index,
+				style=slider.style,
+			))>
+			$(
+					slider.show_value ? @htl(
+					"""<script>
+					const input_el = currentScript.previousElementSibling
+					const output_el = currentScript.nextElementSibling
+					const displays = $(string.(slider.values))
+					
+					input_el.addEventListener("input", () => {
+						output_el.value = displays[input_el.valueAsNumber - 1]
+					})
+					</script><output style='
+						font-family: system-ui;
+						font-size: 15px;
+						margin-left: 3px;
+						transform: translateY(-4px);
+						display: inline-block;'>$(string(slider.default))</output>"""
+				) : nothing
+			)"""
+		))
+	end
 end
 
 # ╔═╡ f3bfa9e8-b7ed-41fe-b4e8-f7cfdafde9d6
@@ -65,68 +123,6 @@ end
 
 # ╔═╡ 47a3798b-2dc3-4cbc-8c34-3a5cc2cf4d50
 Slider(30:.5:40; style=(var"-webkit-appearance"="slider-vertical", width="1em"))
-
-# ╔═╡ 53a37124-e52a-491d-a06d-3e8bb50c4a73
-
-
-# ╔═╡ 599e7851-21db-4430-b9ae-d3b3f06ccdff
-function Base.show(io::IO, m::MIME"text/html", slider::Slider)
-	start_index = findfirst(isequal(slider.default), slider.values)
-	
-	# comment from @fonsp:
-	# It looks like this could be implemented in a slightly more robust way by listening to the "change" event instead of "input" on the <input type=range> element. That means that you don't need the mouseup handlers, but you still need a wrapper element, custom value property etc.
-	show(io, m, @htl(
-		"""
-		$(
-				slider.on_release ? @htl(
-				"""<span></span>
-				<script>
-				const input_el = currentScript.nextElementSibling;
-				const event_el = currentScript.previousElementSibling;
-
-				const propagateevt = () => {
-					const new_value = input_el.valueAsNumber;
-					if (new_value == event_el.value) {
-						return;
-					}
-					event_el.value = new_value;
-					event_el.dispatchEvent(new CustomEvent("input"));
-				}
-				input_el.addEventListener("mouseup", propagateevt);
-				input_el.addEventListener("touchend", propagateevt);
-				input_el.addEventListener("input", e => e.stopPropagation());
-				event_el.value = $start_index;
-				</script>
-				"""
-			) : nothing
-		)
-		<input $((
-			type="range",
-			min=1,
-			max=length(slider.values),
-			value=start_index,
-			style=slider.style,
-		))>
-		$(
-				slider.show_value ? @htl(
-				"""<script>
-				const input_el = currentScript.previousElementSibling
-				const output_el = currentScript.nextElementSibling
-				const displays = $(string.(slider.values))
-				
-				input_el.addEventListener("input", () => {
-					output_el.value = displays[input_el.valueAsNumber - 1]
-				})
-				</script><output style='
-					font-family: system-ui;
-					font-size: 15px;
-					margin-left: 3px;
-					transform: translateY(-4px);
-					display: inline-block;'>$(string(slider.default))</output>"""
-			) : nothing
-		)"""
-	))
-end
 
 # ╔═╡ 5679f79d-10ae-4ab2-9470-f15db2636712
 Base.get(slider::Slider) = slider.default
@@ -190,7 +186,7 @@ PlutoUI = "~0.7.51"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.0"
+julia_version = "1.10.3"
 manifest_format = "2.0"
 project_hash = "63aa77a61349dbd6629dc28ec0f9d2721b4b6764"
 
@@ -238,7 +234,7 @@ version = "0.11.4"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.0.5+1"
+version = "1.1.1+0"
 
 [[deps.CompositionsBase]]
 git-tree-sha1 = "802bb88cd69dfd1509f6670416bd4434015693ad"
@@ -414,7 +410,7 @@ version = "1.2.0"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.23+2"
+version = "0.3.23+4"
 
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
@@ -553,8 +549,6 @@ version = "17.4.0+2"
 # ╠═55fa7b18-54ad-4910-ac5f-4e91a264333f
 # ╠═a683c9b4-4285-49b5-bcc9-7fc572f03e91
 # ╠═5400e620-0479-11ee-3e40-e986b7b30ab0
-# ╠═53a37124-e52a-491d-a06d-3e8bb50c4a73
-# ╠═599e7851-21db-4430-b9ae-d3b3f06ccdff
 # ╠═5679f79d-10ae-4ab2-9470-f15db2636712
 # ╠═77791e63-c04d-4d7e-accc-c997c994e468
 # ╠═d0ff290d-2318-4114-b92e-da9dc2dc9afa
