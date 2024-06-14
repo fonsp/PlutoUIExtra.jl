@@ -37,6 +37,16 @@ end
     # my tests
     using IntervalSets
     Slider(1..10)
+
+    using Accessors
+    sl = Slider(0:10)
+    @test default(sl) == 0
+    sl2 = @set sl.default = 5
+    @test default(sl2) == 5
+    sl2 = @set sl.default = 5.8
+    @test default(sl2) == 6
+    sl2 = @set sl.values = 5:10
+    @test default(sl2) == 5
 end
 
 @testitem "Select" begin

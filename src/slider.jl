@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.42
 
 using Markdown
 using InteractiveUtils
@@ -19,6 +19,9 @@ using IntervalSets
 
 # ╔═╡ 31d7d58f-a1b2-49e9-9b8f-68599c847cec
 using FlexiMaps
+
+# ╔═╡ 3c4b3afd-5187-4101-b863-59f6ef066c16
+using ConstructionBase
 
 # ╔═╡ a683c9b4-4285-49b5-bcc9-7fc572f03e91
 using HypertextLiteral
@@ -55,6 +58,10 @@ begin
 		end
 		vals = unique(round.(vals, sigdigits=3))
 		Slider(vals; kwargs...)
+	end
+
+	ConstructionBase.constructorof(::Type{<:Slider}) = function(values, default, show_value::Bool, on_release::Bool, style)
+		Slider(values; default, show_value, on_release, style)
 	end
 
 	function Base.show(io::IO, m::MIME"text/html", slider::Slider)
@@ -124,6 +131,15 @@ end
 # ╔═╡ 47a3798b-2dc3-4cbc-8c34-3a5cc2cf4d50
 Slider(30:.5:40; style=(var"-webkit-appearance"="slider-vertical", width="1em"))
 
+# ╔═╡ dfc6878d-bb3d-4c2f-ac0e-fb4b91595c5b
+sl = Slider(1:10)
+
+# ╔═╡ e9858cfc-c741-4aae-beed-a751a99bc222
+setproperties(sl, default=6.5)
+
+# ╔═╡ 4d86401c-4888-4c02-9abd-2580473d0f07
+setproperties(sl, values=5:10)
+
 # ╔═╡ 5679f79d-10ae-4ab2-9470-f15db2636712
 Base.get(slider::Slider) = slider.default
 
@@ -169,6 +185,7 @@ Bonds.validate_value(slider::Slider, val) = val isa Integer && 1 <= val <= lengt
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 AbstractPlutoDingetjes = "6e696c72-6542-2067-7265-42206c756150"
+ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
 FlexiMaps = "6394faf6-06db-4fa8-b750-35ccc60383f7"
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
@@ -176,6 +193,7 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 AbstractPlutoDingetjes = "~1.1.4"
+ConstructionBase = "~1.5.5"
 FlexiMaps = "~0.1.24"
 HypertextLiteral = "~0.9.4"
 IntervalSets = "~0.7.9"
@@ -186,9 +204,9 @@ PlutoUI = "~0.7.51"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "63aa77a61349dbd6629dc28ec0f9d2721b4b6764"
+project_hash = "f2c785aa31152f768d8a56e99b533a3223e713e1"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -247,9 +265,9 @@ weakdeps = ["InverseFunctions"]
 
 [[deps.ConstructionBase]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "c53fc348ca4d40d7b371e71fd52251839080cbc9"
+git-tree-sha1 = "260fd2400ed2dab602a7c15cf10c1933c59930a2"
 uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
-version = "1.5.4"
+version = "1.5.5"
 
     [deps.ConstructionBase.extensions]
     ConstructionBaseIntervalSetsExt = "IntervalSets"
@@ -539,6 +557,7 @@ version = "17.4.0+2"
 # ╠═ecb07281-3405-4fbd-8ace-bb53785490e6
 # ╠═86c94ce2-4eec-4b00-938c-7dd6a0071c3b
 # ╠═31d7d58f-a1b2-49e9-9b8f-68599c847cec
+# ╠═3c4b3afd-5187-4101-b863-59f6ef066c16
 # ╠═bd9b0a51-1d25-4f53-bd87-a2fc998704b7
 # ╠═1854fc42-e10a-4c1b-97db-cbb4e68695a2
 # ╠═f3bfa9e8-b7ed-41fe-b4e8-f7cfdafde9d6
@@ -546,6 +565,9 @@ version = "17.4.0+2"
 # ╠═a2f83ae0-7679-4fe0-8377-c623989eef8f
 # ╠═d4dd14aa-6531-4b5d-a0e3-bf03d0b32eec
 # ╠═7afcb5e7-05a2-4737-aa8b-9768bcea6067
+# ╠═dfc6878d-bb3d-4c2f-ac0e-fb4b91595c5b
+# ╠═e9858cfc-c741-4aae-beed-a751a99bc222
+# ╠═4d86401c-4888-4c02-9abd-2580473d0f07
 # ╠═55fa7b18-54ad-4910-ac5f-4e91a264333f
 # ╠═a683c9b4-4285-49b5-bcc9-7fc572f03e91
 # ╠═5400e620-0479-11ee-3e40-e986b7b30ab0
